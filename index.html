@@ -115,7 +115,7 @@ function pick(k){
   document.getElementById("nx").onclick=function(){i++;i<Q.length?show():end()}
 }
 function end(){
-  TK=[];var p=Math.round(score/Q.length*100),m=p>=90?"מצוין! שליטה מלאה במודל החלקיקי.":p>=60?"יפה! כדאי לחזור על השאלות שנפלתם בהן.":"כדאי לחזור על החומר ולנסות שוב.";
+  TK=[];var p=Math.round(score/Q.length*100),m=p>=90?"מצוין! שליטה מלאה במודל החלקיקי.":p>=60?"יפה! כדאי לחזור על השאלות שטעיתם בהן.":"כדאי לחזור על החומר ולנסות שוב.";
   app.innerHTML='<div class="center"><div class="big">'+score+' / '+Q.length+'</div><p>'+m+'</p><button class="btn" id="re">נסו שוב</button></div>';
   document.getElementById("re").onclick=function(){i=0;score=0;show()}
 }
