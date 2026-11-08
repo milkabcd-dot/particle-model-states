@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>חידון: מודל חלקיקי של מים</title>
+<style>
+:root{--bg:#eef4f3;--card:#fff;--tx:#17323a;--mu:#5b7479;--ac:#0f7b8a;--ok:#2e8b57;--okb:#e1f3e8;--no:#c0392b;--nob:#fbe9e7;--bd:#cfe0e0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1c20;--card:#17292e;--tx:#e6f1f2;--mu:#9ab4b8;--ac:#4fc3d4;--ok:#5cc58a;--okb:#16352580;--no:#ff7b6b;--nob:#3a1e1b;--bd:#2c474d}}
+:root[data-theme="dark"]{--bg:#0f1c20;--card:#17292e;--tx:#e6f1f2;--mu:#9ab4b8;--ac:#4fc3d4;--ok:#5cc58a;--okb:#16352580;--no:#ff7b6b;--nob:#3a1e1b;--bd:#2c474d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:"Heebo","Assistant",system-ui,Arial,sans-serif;line-height:1.55}
+main{max-width:700px;margin:0 auto;padding:16px 16px 36px}
+h1{font-size:1.45rem;margin:.2em 0}
+.sub{color:var(--mu);margin:0 0 14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px}
+.bar{height:6px;background:var(--bd);border-radius:3px;margin-bottom:14px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ac);transition:width .3s}
+.meta{display:flex;justify-content:space-between;color:var(--mu);font-size:.9rem;margin-bottom:8px}
+.q{font-size:1.15rem;font-weight:600;margin:6px 0 12px}
+.cv{display:block;width:100%;max-width:380px;height:auto;margin:0 auto 12px;background:color-mix(in srgb,var(--ac) 6%,var(--card));border:1px solid var(--bd);border-radius:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.two .cv{margin-bottom:6px}
+.sc{border:2px solid var(--tx);border-radius:10px;padding:6px;text-align:center;font-weight:700;direction:ltr;font-variant-numeric:tabular-nums}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;color:inherit;text-align:right;background:transparent;border:2px solid var(--bd);border-radius:10px;padding:11px 14px;cursor:pointer}
+.opt:hover:not(:disabled){border-color:var(--ac)}
+.opt.ok{border-color:var(--ok);background:var(--okb)}
+.opt.no{border-color:var(--no);background:var(--nob)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pc{padding:6px}.pc .cv{margin:0;max-width:none}
+.grid .pc:last-child{grid-column:1/-1;justify-self:center;width:50%}
+.fb{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--bg);border:1px solid var(--bd)}
+.btn{font:inherit;background:var(--ac);color:#fff;border:0;border-radius:10px;padding:10px 22px;margin-top:14px;cursor:pointer;font-weight:600}
+button:focus-visible{outline:3px solid #e07a1f;outline-offset:2px}
+.big{font-size:2.6rem;font-weight:700;text-align:center;margin:8px 0}
+.center{text-align:center}
+footer{text-align:center;color:var(--mu);margin-top:16px;font-size:.9rem}
+</style>
+</head>
+<body>
+<main>
+<h1>חידון: מודל חלקיקי של מים</h1>
+<p class="sub">חימום וקירור מים בכלי אטום – מצבי צבירה, טמפרטורה ושימור מסה</p>
+<div class="card" id="app"></div>
+<footer>© מילכה ברקו גרש</footer>
+</main>
+<script>
+// מנוע החלקיקים – מבוסס על סימולציות "קיפאון והיתוך" ו"שימור מסה"
+var N=96,TK=[],SP={"א":[96,0],"ב":[48,48],"ג":[0,96],"ד":[0,48],"ה":[0,0]};function FL(n){return n?269.6-Math.ceil(n/24)*13.6:272}
+var BH=[3,3,2,2,2,1,1,2,2,3,3,2,2,1,2,2,2,1,1,2,2,3,2,2];
+function SS(L){var a=[],r,c,i;if(L=="ב"){for(r=0;r<3;r++)for(c=0;c<24;c++)if(r<BH[c])a.push([53.6+c*13.6,270-r*13.6])}else for(i=0;i<SP[L][0];i++)a.push([53.6+(i%24)*13.6,270-Math.floor(i/24)*13.6]);return a}
+function FLX(L,x){if(L!="ב")return FL(SP[L][0]);var m=0,c;for(c=0;c<24;c++)if(Math.abs(53.6+c*13.6-x)<=13)m=Math.max(m,BH[c]);return m?270-(m-1)*13.6-14:272}
+function cl(v,a,b){return Math.min(b,Math.max(a,v))}
+function cv(L){return '<canvas class="cv" data-l="'+L+'" width="420" height="300" role="img" aria-label="תמונה '+L+'"></canvas>'}
+function boot(){
+  var ink=getComputedStyle(document.documentElement).getPropertyValue("--tx").trim()||"#222";
+  document.querySelectorAll("canvas[data-l]").forEach(function(c){
+    var L=c.dataset.l,s=SP[L],nS=s[0],nL=s[1],fl=FL(nS),top=fl-nL*400/364,P=[],SL=SS(L),i,t,sl,p,a;
+    for(i=0;i<N;i++){t=i<nS?0:i<nS+nL?1:2;sl=SL[i]||[0,0];p={i:i,t:t,vx:0,vy:0,a:0,sx:sl[0],sy:sl[1]};
+      if(t==0){p.x=sl[0];p.y=sl[1]}
+      else if(t==1){var j=i-nS,rw=Math.floor(j/24),cc=j-rw*24;p.hx=35+cc*14.9+(rw%2?7.4:0);p.hy=FLX(L,p.hx)-5-rw*12.9;p.x=p.hx+(Math.random()-.5)*3;p.y=p.hy+(Math.random()-.5)*3}
+      else{p.x=40+Math.random()*340;p.y=40+Math.random()*220;a=Math.random()*6.28;p.vx=Math.cos(a)*2.5;p.vy=Math.sin(a)*2.5}
+      P.push(p)}
+    TK.push({x:c.getContext("2d"),P:P,nS:nS,nL:nL,L:L,ink:ink})})
+}
+function stp(T){
+  var x=T.x,P=T.P,nS=T.nS,nL=T.nL,fl=FL(nS),top=fl-nL*400/364,Sd=P.slice(0,nS),Lq=P.slice(nS,nS+nL),k,a,b;
+  x.clearRect(0,0,420,300);x.strokeStyle=T.ink;x.lineWidth=3;x.strokeRect(20,20,380,260);
+  for(k=0;k<4;k++){
+    for(a=0;a<Lq.length;a++)for(b=a+1;b<Lq.length;b++){var A=Lq[a],B=Lq[b],dx=B.x-A.x,dy=B.y-A.y,d=Math.hypot(dx,dy)||.01;if(d<14.4){var q=(14.4-d)/2/d;A.x-=dx*q;A.y-=dy*q;B.x+=dx*q;B.y+=dy*q}}
+    Lq.forEach(function(A){Sd.forEach(function(B){var dx=A.x-B.x,dy=A.y-B.y,d=Math.hypot(dx,dy)||.01;if(d<13.6){var q=(13.6-d)/d;A.x+=dx*q;A.y+=dy*q}})})}
+  Lq.forEach(function(p){p.x=cl(p.x,28,392);p.y=cl(p.y,top,FLX(T.L,p.x))});
+  if(Lq.length>1&&Math.random()<.5){var u=Lq[Math.random()*Lq.length|0],w=Lq[Math.random()*Lq.length|0];if(Math.hypot(u.hx-w.hx,u.hy-w.hy)<32){var hx=u.hx,hy=u.hy;u.hx=w.hx;u.hy=w.hy;w.hx=hx;w.hy=hy}}
+  P.forEach(function(p){
+    if(p.t==0){p.x+=(p.sx-p.x)*.2+(Math.random()-.5)*.7;p.y+=(p.sy-p.y)*.2+(Math.random()-.5)*.7}
+    else if(p.t==1){p.vx+=(Math.random()-.5)*.6+(p.hx-p.x)*.012;p.vy+=(Math.random()-.5)*.4+(p.hy-p.y)*.012;p.vx*=.85;p.vy*=.85;p.x=cl(p.x+p.vx,28,392);p.y=cl(p.y+p.vy,top,FLX(T.L,p.x))}
+    else{p.x+=p.vx*1.1;p.y+=p.vy*1.1;if(p.x<30||p.x>390)p.vx*=-1;if(p.y<30||p.y>270)p.vy*=-1;p.x=cl(p.x,28,392);p.y=cl(p.y,28,272)}
+    x.beginPath();x.arc(p.x,p.y,6,0,7);x.fillStyle="#5ec4f0";x.fill();x.strokeStyle="#2b8cc0";x.lineWidth=1;x.stroke()});
+  x.strokeStyle=T.ink;x.lineWidth=1;x.strokeRect(194,27,32,28);x.fillStyle=T.ink;x.font="bold 20px sans-serif";x.textAlign="center";x.fillText(T.L,210,48)
+}
+(function lp(){TK.forEach(stp);requestAnimationFrame(lp)})();
+var ALL=["א","ב","ג","ד","ה"];
+var Q=[
+{p:"א",q:"באיזה מצב צבירה נמצאים המים בתמונה א?",o:["מוצק","נוזל","גז","נוזל וגז"],a:0,e:"החלקיקים צפופים, מסודרים בסריג קבוע ורק רועדים במקומם – מוצק (קרח)."},
+{p:"ג",q:"באיזה מצב צבירה נמצאים המים בתמונה ג?",o:["מוצק","נוזל","גז","מוצק וגז"],a:1,e:"החלקיקים צפופים ונוגעים זה בזה, אך אינם מסודרים בסריג קבוע ונעים זה על פני זה – נוזל."},
+{p:"ה",q:"באיזה מצב צבירה נמצאים המים בתמונה ה?",o:["מוצק","נוזל","גז","מוצק ונוזל"],a:2,e:"החלקיקים רחוקים מאוד זה מזה, נעים במהירות בכל נפח הכלי – גז (אדי מים)."},
+{p:"ב",q:"אילו מצבי צבירה מיוצגים יחד בתמונה ב?",o:["מוצק ונוזל","נוזל וגז","מוצק וגז","מוצק בלבד"],a:0,e:"בשכבה התחתונה החלקיקים מסודרים בסריג (מוצק), ומעליה חלקיקים שנעים בחופשיות זה על פני זה (נוזל)."},
+{p:"ד",q:"אילו מצבי צבירה מיוצגים יחד בתמונה ד?",o:["מוצק ונוזל","נוזל וגז","מוצק וגז","גז בלבד"],a:1,e:"בתחתית שכבת נוזל צפופה, ובכל שאר הכלי חלקיקים בודדים ומהירים (גז)."},
+{pics:1,q:"איזו מבין התמונות יכולה לייצג עיבוי או רתיחה? (לחצו על התמונה)",a:"ד",e:"בעיבוי ובהתאדות/רתיחה נמצאים יחד נוזל וגז – כמו בתמונה ד."},
+{pics:1,q:"איזו מבין התמונות יכולה לייצג קיפאון או היתוך? (לחצו על התמונה)",a:"ב",e:"בקיפאון ובהיתוך נמצאים יחד מוצק ונוזל – כמו בתמונה ב (בטמפרטורה של 0°C)."},
+{p:"ה",q:"איזו טמפרטורה מתאימה למים בתמונה ה (בתווך שבין 120- ל־120°C)?",o:["20°C-","0°C","50°C","110°C"],a:3,e:"מים במצב גז, בטווח הנתון, נמצאים מעל 100°C, לכן 110°C מתאימה."},
+{p:"ג",q:"איזו טמפרטורה מתאימה למים בתמונה ג?",o:["20°C-","50°C","100°C","120°C"],a:1,e:"מים נוזליים נמצאים בין 0°C ל־100°C, ולכן 50°C מתאימה."},
+{mass:1,q:"הכלים אטומים והמים שבהם הם אותם מים. המסה של המים בכלי ה היא 240 גרם. מהי מסת המים בכלי ג?",o:["פחות מ־240 גרם","240 גרם","יותר מ־240 גרם","אי אפשר לדעת"],a:1,e:"בכלי אטום אף חלקיק לא נכנס ולא יוצא. מצב הצבירה משתנה, אך המסה נשמרת – 240 גרם."}
+];
+var app=document.getElementById("app"),i=0,score=0;
+function show(){
+  TK=[];var q=Q[i],h='<div class="meta"><span>שאלה '+(i+1)+' מתוך '+Q.length+'</span><span>ניקוד: '+score+'</span></div><div class="bar"><i style="width:'+(i/Q.length*100)+'%"></i></div>';
+  if(q.pics){h+='<div class="q">'+q.q+'</div><div class="grid">';
+    ALL.forEach(function(L,k){h+='<button class="opt pc" data-k="'+k+'" aria-label="תמונה '+L+'">'+cv(L)+'</button>'});h+='</div>'}
+  else{
+    if(q.mass)h+='<div class="q">'+q.q+'</div><div class="two"><div>'+cv("ה")+'<div class="sc">240.0 g</div></div><div>'+cv("ג")+'<div class="sc" id="s2">? g</div></div></div>';
+    else h+=cv(q.p)+'<div class="q">'+q.q+'</div>';
+    h+='<div class="opts">';q.o.forEach(function(t,k){h+='<button class="opt" data-k="'+k+'">'+t+'</button>'});h+='</div>'}
+  h+='<div id="fb"></div>';app.innerHTML=h;boot();
+  app.querySelectorAll(".opt").forEach(function(b){b.onclick=function(){pick(+b.dataset.k)}})
+}
+function pick(k){
+  var q=Q[i],bs=app.querySelectorAll(".opt"),ans=q.pics?ALL.indexOf(q.a):q.a,ok=k==ans;
+  bs.forEach(function(b,j){b.disabled=true;if(j==ans)b.classList.add("ok");else if(j==k)b.classList.add("no")});
+  if(ok)score++;
+  if(q.mass)document.getElementById("s2").textContent="240.0 g";
+  document.getElementById("fb").innerHTML='<div class="fb"><b>'+(ok?"נכון!":"לא מדויק.")+'</b> '+q.e+'</div><button class="btn" id="nx">'+(i<Q.length-1?"לשאלה הבאה":"לתוצאות")+'</button>';
+  document.getElementById("nx").onclick=function(){i++;i<Q.length?show():end()}
+}
+function end(){
+  TK=[];var p=Math.round(score/Q.length*100),m=p>=90?"מצוין! שליטה מלאה במודל החלקיקי.":p>=60?"יפה! כדאי לחזור על השאלות שנפלתם בהן.":"כדאי לחזור על החומר ולנסות שוב.";
+  app.innerHTML='<div class="center"><div class="big">'+score+' / '+Q.length+'</div><p>'+m+'</p><button class="btn" id="re">נסו שוב</button></div>';
+  document.getElementById("re").onclick=function(){i=0;score=0;show()}
+}
+show();
+</script>
+</body>
+</html>
